@@ -503,101 +503,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements ---
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const mapChartEl = document.getElementById('map-chart');
-            const analyticsChartEl = document.getElementById('analytics-chart');
-            const tabMap = document.getElementById('tab-map');
-            const tabAnalytics = document.getElementById('tab-analytics');
-            const continentSelect = document.getElementById('continent-select');
-            const airlineSelect = document.getElementById('airline-select');
-            const resetFiltersBtn = document.getElementById('reset-filters-btn');
-            const exportPdfBtn = document.getElementById('export-pdf-btn');
-            const langToggle = document.getElementById('lang-toggle');
-            const demoBtn = document.getElementById('demo-btn');
-
-            // --- ECharts Instances ---
-            let mapChart, analyticsChart;
-            
-            // --- State ---
-            let allRoutesData = [];
-            let currentLang = 'fr';
-            let godView = false;
-            const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-            let konamiIndex = 0;
-
-
-            // --- Translations ---
-            const translations = {
-                fr: {
-                    title: "AirFlow Dynamics",
-                    subtitle: "Intelligence du Trafic Aérien Mondial",
-                    visualSynthesis: "Synthèse Visuelle",
-                    detailedAnalytics: "Analyses Détaillées",
-                    exportPDF: "Exporter en PDF",
-                    continent: "Continent",
-                    airline: "Compagnie",
-                    resetFilters: "Réinitialiser",
-                    totalRoutes: "Routes Totales Analysées",
-                    fromOpenFlights: "issues des données OpenFlights",
-                    activeAirlines: "Compagnies Aériennes Actives",
-                    inDataset: "dans le jeu de données",
-                    covidRecovery: "Taux de Récupération (Post-COVID)",
-                    comparedTo2019: "par rapport au pic de 2019",
-                    busiestRoute: "Route la Plus Fréquentée",
-                    mostConnections: "le plus de connexions",
-                    dailyFlights: "Vols Quotidiens Estimés",
-                    basedOnRoutes: "basé sur le total des routes",
-                    footer: "Vue d'ensemble data-driven (OpenFlights). KPIs, routes signatures et tendances.",
-                    allContinents: "Tous les continents",
-                    allAirlines: "Toutes les compagnies"
-                },
-                en: {
-                    title: "AirFlow Dynamics",
-                    subtitle: "Global Air Traffic Intelligence",
-                    visualSynthesis: "Visual Synthesis",
-                    detailedAnalytics: "Detailed Analytics",
-                    exportPDF: "Export as PDF",
-                    continent: "Continent",
-                    airline: "Airline",
-                    resetFilters: "Reset",
-                    totalRoutes: "Total Routes Analyzed",
-                    fromOpenFlights: "from OpenFlights data",
-                    activeAirlines: "Active Airlines",
-                    inDataset: "in the dataset",
-                    covidRecovery: "Recovery Rate (Post-COVID)",
-                    comparedTo2019: "compared to 2019 peak",
-                    busiestRoute: "Busiest Route",
-                    mostConnections: "most connections",
-                    dailyFlights: "Estimated Daily Flights",
-                    basedOnRoutes: "based on total routes",
-                    footer: "Data-driven overview (OpenFlights). KPIs, route signatures and trends.",
-                    allContinents: "All Continents",
-                    allAirlines: "All Airlines"
-                }
-            };
-            
-            // --- Utility Functions ---
-            const animateCounter = (el, start, end, duration) => {
-                if (start === end) return;
-                let startTimestamp = null;
-                const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-                
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    const easedProgress = easeOutCubic(progress);
-                    el.innerText = Math.floor(easedProgress * (end - start) + start).toLocaleString('fr-FR');
-                    
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    } else {
-                        el.innerText = end.toLocaleString('fr-FR');
-                    }
-                };
-                window.requestAnimationFrame(step);
-            };
-            
+            // ... existing code ... -->
             const translatePage = () => {
                 document.querySelectorAll('[data-key]').forEach(el => {
                     const key = el.dataset.key;
@@ -612,16 +518,16 @@
             
             // --- Data Processing ---
             const processData = (data) => {
-                // Remove header and filter for valid coordinate data
-                return data.slice(1).map(row => ({
-                    airline: row[0],
-                    src_iata: row[9],
-                    src_lat: parseFloat(row[11]),
-                    src_lon: parseFloat(row[12]),
-                    dst_iata: row[17],
-                    dst_lat: parseFloat(row[19]),
-                    dst_lon: parseFloat(row[20]),
-                    route_key: row[22],
+                // Now uses header names instead of column indexes. Much more robust.
+                return data.map(row => ({
+                    airline: row.airline,
+                    src_iata: row.src_iata,
+                    src_lat: parseFloat(row.src_latitude),
+                    src_lon: parseFloat(row.src_longitude),
+                    dst_iata: row.dst_iata,
+                    dst_lat: parseFloat(row.dst_latitude),
+                    dst_lon: parseFloat(row.dst_longitude),
+                    route_key: row.route_key,
                 })).filter(r => r && !isNaN(r.src_lat) && !isNaN(r.src_lon) && !isNaN(r.dst_lat) && !isNaN(r.dst_lon));
             };
 
@@ -887,10 +793,12 @@
 
                 // Fetch and parse data
                 try {
-                    const response = await fetch('./openflights_routes_enriched.csv');
+                    // Using a cleaner filename and a more robust parsing method.
+                    const response = await fetch('./routes.csv');
                     const csvText = await response.text();
                     const parsed = Papa.parse(csvText, {
-                        skipEmptyLines: true
+                        skipEmptyLines: true,
+                        header: true // Use headers to make parsing robust
                     });
                     
                     allRoutesData = processData(parsed.data);
@@ -912,4 +820,5 @@
     </script>
 </body>
 </html>
+
 
