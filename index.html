@@ -798,7 +798,8 @@
                     const csvText = await response.text();
                     const parsed = Papa.parse(csvText, {
                         skipEmptyLines: true,
-                        header: true // Use headers to make parsing robust
+                        header: true, // Use headers to make parsing robust
+                        delimiter: ";" // Added delimiter for French CSV format
                     });
                     
                     allRoutesData = processData(parsed.data);
@@ -820,5 +821,6 @@
     </script>
 </body>
 </html>
+
 
 
