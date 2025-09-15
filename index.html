@@ -138,12 +138,6 @@
             position: relative;
             padding: 0.5rem;
         }
-
-        .lang-toggle:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,188,212,0.3);
-            border-radius: 8px;
-        }
         
         .btn {
             background-color: var(--accent-cyan);
@@ -157,15 +151,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 44px; /* Touch target size */
         }
 
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 188, 212, 0.3);
-        }
-        
-        .btn:active {
-            transform: translateY(-1px);
         }
         
         .dashboard-grid {
@@ -228,35 +219,12 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2300bcd4' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
+            min-height: 44px; /* Touch target size */
         }
         
-        /* FIX: Dropdown options visibility */
         .filter-select option {
             background-color: var(--bg-dark);
             color: var(--text-white);
-        }
-        
-        .filter-select:hover {
-            background: rgba(0,188,212,0.1);
-            border-color: var(--accent-cyan);
-        }
-
-        .filter-select:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,188,212,0.3);
-            transform: scale(1.02);
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
-        }
-
-        .btn-secondary:hover {
-            background-color: rgba(0,188,212,0.1);
-            box-shadow: none;
-            transform: translateY(0);
         }
         
         #chart-container {
@@ -265,251 +233,68 @@
         }
 
         .chart {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
             opacity: 1;
             transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
             transform: scale(1);
         }
-
-        .chart.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.98);
-        }
+        .chart.hidden { opacity: 0; pointer-events: none; transform: scale(0.98); }
         
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .sidebar { display: flex; flex-direction: column; gap: 1rem; }
 
-        /* NEW: Insight Card */
-        .insight-card {
-            border-color: var(--accent-blue);
-            text-align: center;
-        }
-        .insight-title {
-            font-weight: bold;
-            color: var(--accent-blue);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        #insight-text {
-            font-size: 0.95rem;
-            min-height: 50px;
-            color: var(--text-white);
-        }
+        .insight-card { border-color: var(--accent-blue); text-align: center; }
+        .insight-title { font-weight: bold; color: var(--accent-blue); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        #insight-text { font-size: 0.95rem; min-height: 50px; color: var(--text-white); }
 
-        /* NEW: AI Prediction Card */
-        .ai-card {
-             border-color: var(--accent-green);
-        }
-        .ai-title {
-            font-weight: bold;
-            color: var(--accent-green);
-            margin-bottom: 0.75rem;
-        }
-        #ai-prediction-text {
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-        .confidence-bar-container {
-            width: 100%;
-            height: 8px;
-            background-color: rgba(76, 175, 80, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        #confidence-bar {
-            width: 92%; /* Example confidence */
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #81c784);
-            border-radius: 4px;
-        }
+        .ai-card { border-color: var(--accent-green); }
+        .ai-title { font-weight: bold; color: var(--accent-green); margin-bottom: 0.75rem; }
+        #ai-prediction-text { font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .confidence-bar-container { width: 100%; height: 8px; background-color: rgba(76, 175, 80, 0.2); border-radius: 4px; overflow: hidden; }
+        #confidence-bar { width: 92%; height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); border-radius: 4px; }
 
-        .metric-card {
-            position: relative;
-            overflow: hidden;
-            border-width: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .metric-icon {
-            font-size: 1.75rem;
-            color: var(--accent-cyan);
-            opacity: 0.7;
-            padding-right: 1rem;
-            border-right: 1px solid var(--border-color);
-        }
+        .metric-card { position: relative; overflow: hidden; border-width: 1px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: flex; align-items: center; gap: 1rem; }
+        .metric-icon { font-size: 1.75rem; color: var(--accent-cyan); opacity: 0.7; padding-right: 1rem; border-right: 1px solid var(--border-color); }
+        .metric-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; color: var(--accent-cyan); transition: all 0.3s ease; }
         
-        .metric-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-        
-        .metric-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            transition: all 0.3s ease;
-        }
-        
-        .metric-subtext {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            min-height: 1.2rem;
-            line-height: 1.2rem;
-        }
-        
-        .loading-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(10, 25, 41, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-
-        .loader {
-            width: 50px;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            border: 8px solid;
-            border-color: #0000 #00bcd4;
-            animation: l1 1s infinite;
-        }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 25, 41, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.5s ease; }
+        .loader { width: 50px; aspect-ratio: 1; border-radius: 50%; border: 8px solid; border-color: #0000 #00bcd4; animation: l1 1s infinite; }
         @keyframes l1 {to{transform: rotate(.5turn)}}
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
 
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
+        .footer { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.9rem; margin-top: 2rem; }
         
-        .god-view-banner, .achievement-toast {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--accent-cyan);
-            color: var(--bg-dark);
-            padding: 0.5rem 2rem;
-            border-radius: 50px;
-            font-weight: bold;
-            z-index: 9999;
-            animation: fadeInDown 0.5s ease;
-            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
-        }
-        
-        .achievement-toast {
-             background-color: var(--accent-green);
-             box-shadow: 0 10px 30px rgba(76, 175, 80, 0.6);
-        }
+        .god-view-banner, .achievement-toast { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background-color: var(--accent-cyan); color: var(--bg-dark); padding: 0.5rem 2rem; border-radius: 50px; font-weight: bold; z-index: 9999; animation: fadeInDown 0.5s ease; box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6); }
+        .achievement-toast { background-color: var(--accent-green); box-shadow: 0 10px 30px rgba(76, 175, 80, 0.6); }
+        #badges-container { margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center; align-items: center; }
+        .badge { font-size: 1.5rem; opacity: 0.5; transition: all 0.3s ease; filter: grayscale(1); }
+        .badge.unlocked { opacity: 1; transform: scale(1.1); filter: grayscale(0); }
 
-        #badges-container {
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .badge {
-            font-size: 1.5rem;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-            filter: grayscale(1);
-        }
-        .badge.unlocked {
-            opacity: 1;
-            transform: scale(1.1);
-            filter: grayscale(0);
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translate(-50%, -100%); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
+        @keyframes fadeInDown { from { opacity: 0; transform: translate(-50%, -100%); } to { opacity: 1; transform: translate(-50%, 0); } }
 
         @media (hover: hover) and (min-width: 1024px) {
-            .metric-card:hover {
-                transform: translateY(-4px) scale(1.02);
-                box-shadow: 0 15px 30px rgba(0,188,212,0.25);
-                border-color: var(--accent-cyan);
-                background: radial-gradient(circle at center, rgba(0,188,212,0.1) 0%, rgba(10, 25, 41, 0.5) 100%);
-            }
-
-            .metric-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -150%;
-                width: 50%;
-                height: 100%;
-                background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
-                transform: skewX(-25deg);
-                transition: left 0.75s;
-            }
-
-            .metric-card:hover::before {
-                left: 150%;
-            }
-
-            .metric-value:hover {
-                color: #fff;
-                text-shadow: 0 0 15px var(--accent-cyan);
-                transform: scale(1.05);
-                display: inline-block;
-            }
+            .metric-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px rgba(0,188,212,0.25); border-color: var(--accent-cyan); background: radial-gradient(circle at center, rgba(0,188,212,0.1) 0%, rgba(10, 25, 41, 0.5) 100%); }
         }
         
-        @media (max-width: 1023px) {
-            .metric-card {
-                transition: none;
-            }
+        #analytics-container { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 1.5rem; height: 100%; }
+        .analytics-sub-chart { width: 100%; height: 300px; }
+        
+        /* Responsive layout for analytics charts */
+        @media (min-width: 768px) {
+            #analytics-container { grid-template-columns: repeat(2, 1fr); }
+            #top-airlines-chart { grid-column: 1 / 2; }
+            #top-airports-chart { grid-column: 2 / 3; }
+            #continent-pie-chart { grid-column: 1 / 3; height: 350px; }
         }
         
-        /* Pimper les tabs + badges */
         .main-nav { box-shadow: 0 8px 24px rgba(0,0,0,.25); }
         .nav-tab { letter-spacing:.2px; border:1px solid rgba(255,255,255,.08); }
         .nav-tab.active { background:linear-gradient(135deg,#0f3b4c,#00bcd4); color:#02131b; }
-        /* Cartes + relief */
         .card { box-shadow: 0 20px 50px rgba(2,6,12,.4), inset 0 1px 0 rgba(255,255,255,.04); }
         .metric-card { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); }
-        /* KPI number gradient */
-        .metric-value {
-            background: linear-gradient(90deg,#00bcd4 0%,#64b5f6 100%);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-        }
-        /* Sélecteurs plus premium */
-        .filter-select {
-            background: radial-gradient(120% 120% at 0% 0%, rgba(0,188,212,.08) 0%, rgba(10,25,41,.8) 60%);
-            border-color: rgba(0,188,212,.25);
-        }
-        /* Transition d’apparition charts */
+        .metric-value { background: linear-gradient(90deg,#00bcd4 0%,#64b5f6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .filter-select { background: radial-gradient(120% 120% at 0% 0%, rgba(0,188,212,.08) 0%, rgba(10,25,41,.8) 60%); border-color: rgba(0,188,212,.25); }
         .chart { transition: opacity .4s ease, transform .4s ease; will-change: transform,opacity; }
 
     </style>
@@ -565,13 +350,19 @@
                 </div>
                 <div class="card" id="chart-container">
                     <div id="map-chart" class="chart"></div>
-                    <div id="analytics-chart" class="chart hidden"></div>
+                    <div id="analytics-chart" class="chart hidden">
+                         <div id="analytics-container">
+                            <div id="top-airlines-chart" class="analytics-sub-chart"></div>
+                            <div id="top-airports-chart" class="analytics-sub-chart"></div>
+                            <div id="continent-pie-chart" class="analytics-sub-chart"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <aside class="sidebar">
-                <div class="card insight-card">
-                    <h3 class="insight-title" data-key="insightTitle">💡 Insight du Jour</h3>
+                 <div class="card insight-card">
+                    <h3 class="insight-title" data-key="insightTitle">💡 Insight Dynamique</h3>
                     <p id="insight-text"></p>
                 </div>
 
@@ -586,7 +377,7 @@
                 <div class="card metric-card">
                     <span class="metric-icon">✈️</span>
                     <div>
-                        <p class="metric-label" data-key="totalRoutes">Routes Totales Analysées</p>
+                        <p class="metric-label" data-key="totalRoutes">Routes Analysées</p>
                         <h2 id="total-routes" class="metric-value">0</h2>
                     </div>
                 </div>
@@ -604,19 +395,12 @@
                         <h2 id="top-airline" class="metric-value">-</h2>
                      </div>
                 </div>
-                <div class="card metric-card">
-                    <span class="metric-icon">📍</span>
-                    <div>
-                        <p class="metric-label" data-key="busiestRoute">Route la Plus Fréquentée</p>
-                        <h2 id="busiest-route" class="metric-value">-</h2>
-                    </div>
-                </div>
                  <div class="card metric-card">
-                    <span class="metric-icon">📏</span>
-                    <div>
-                        <p class="metric-label" data-key="longestRoute">Route la plus Longue</p>
-                        <h2 id="longest-route" class="metric-value">0 km</h2>
-                    </div>
+                    <span class="metric-icon"> HUB </span>
+                     <div>
+                        <p class="metric-label" data-key="busiestAirport">Hub Principal</p>
+                        <h2 id="busiest-airport" class="metric-value">-</h2>
+                     </div>
                 </div>
             </aside>
         </main>
@@ -636,21 +420,21 @@
             // --- DOM Elements ---
             const loadingOverlay = document.getElementById('loading-overlay');
             const mapChartEl = document.getElementById('map-chart');
-            const analyticsChartEl = document.getElementById('analytics-chart');
-            
+            const topAirlinesChartEl = document.getElementById('top-airlines-chart');
+            const topAirportsChartEl = document.getElementById('top-airports-chart');
+            const continentPieChartEl = document.getElementById('continent-pie-chart');
             const tabMap = document.getElementById('tab-map');
             const tabAnalytics = document.getElementById('tab-analytics');
             const continentSelect = document.getElementById('continent-select');
             const airlineSelect = document.getElementById('airline-select');
             const resetFiltersBtn = document.getElementById('reset-filters-btn');
             const exportPdfBtn = document.getElementById('export-pdf-btn');
-            const langToggle = document.getElementById('lang-toggle');
             const demoBtn = document.getElementById('demo-btn');
             const insightTextEl = document.getElementById('insight-text');
             const aiPredictionTextEl = document.getElementById('ai-prediction-text');
 
             // --- ECharts Instances ---
-            let mapChart, analyticsChart;
+            let mapChart, topAirlinesChart, topAirportsChart, continentPieChart;
             
             // --- State ---
             let allRoutesData = [];
@@ -658,102 +442,52 @@
             let godView = false;
             const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
             let konamiIndex = 0;
-            const achievements = {
-                explorer: false,
-                analyst: false,
-                detective: false
-            };
-
+            const achievements = { explorer: false, analyst: false, detective: false };
 
             // --- Translations & Dynamic Content ---
             const translations = {
                 fr: {
-                    title: "AirFlow Dynamics",
-                    subtitle: "Intelligence du Trafic Aérien Mondial",
-                    visualSynthesis: "Synthèse Visuelle",
-                    detailedAnalytics: "Timeline & Tendances",
-                    exportPDF: "Exporter en PDF",
-                    continent: "Continent",
-                    airline: "Compagnie",
-                    resetFilters: "Réinitialiser",
-                    totalRoutes: "Routes Analysées",
-                    activeAirlines: "Compagnies Aériennes",
-                    topAirline: "Compagnie Top 1",
-                    busiestRoute: "Route la Plus Fréquentée",
-                    longestRoute: "Route la plus Longue",
+                    title: "AirFlow Dynamics", subtitle: "Intelligence du Trafic Aérien Mondial",
+                    visualSynthesis: "Synthèse Visuelle", detailedAnalytics: "Analyses Détaillées",
+                    exportPDF: "Exporter en PDF", continent: "Continent", airline: "Compagnie",
+                    resetFilters: "Réinitialiser", totalRoutes: "Routes Analysées", activeAirlines: "Compagnies Aériennes",
+                    topAirline: "Compagnie Top 1", busiestAirport: "Hub Principal",
                     footer: "Vue d'ensemble data-driven (OpenFlights). KPIs, routes signatures et tendances.",
-                    allContinents: "Tous les continents",
-                    allAirlines: "Toutes les compagnies",
-                    insightTitle: "💡 Insight du Jour",
-                    aiTitle: "🤖 Analyse Prédictive",
-                    aiPrediction: "L'IA prévoit +18% de trafic en Asie-Pacifique d'ici 2026 (Confiance: 92%).",
-                    covidTimelineTitle: "Impact du COVID & Prédictions du Trafic Aérien",
+                    allContinents: "Tous les continents", allAirlines: "Toutes les compagnies",
+                    insightTitle: "💡 Insight Dynamique", aiTitle: "🤖 Analyse Prédictive",
+                    top10Airlines: "Top 10 Compagnies", top10Airports: "Top 10 Aéroports (Hubs)",
+                    routesByContinent: "Répartition par Continent",
                     achievementExplorer: "Badge débloqué : Explorateur de Données !",
                     achievementAnalyst: "Badge débloqué : Analyste Expert !",
                     achievementDetective: "Badge débloqué : Data Detective !",
                 },
                 en: {
-                    title: "AirFlow Dynamics",
-                    subtitle: "Global Air Traffic Intelligence",
-                    visualSynthesis: "Visual Synthesis",
-                    detailedAnalytics: "Timeline & Trends",
-                    exportPDF: "Export as PDF",
-                    continent: "Continent",
-                    airline: "Airline",
-                    resetFilters: "Reset",
-                    totalRoutes: "Routes Analyzed",
-                    activeAirlines: "Active Airlines",
-                    topAirline: "Top #1 Airline",
-                    busiestRoute: "Busiest Route",
-                    longestRoute: "Longest Route",
+                    title: "AirFlow Dynamics", subtitle: "Global Air Traffic Intelligence",
+                    visualSynthesis: "Visual Synthesis", detailedAnalytics: "Detailed Analytics",
+                    exportPDF: "Export as PDF", continent: "Continent", airline: "Airline",
+                    resetFilters: "Reset", totalRoutes: "Routes Analyzed", activeAirlines: "Active Airlines",
+                    topAirline: "Top #1 Airline", busiestAirport: "Main Hub",
                     footer: "Data-driven overview (OpenFlights). KPIs, route signatures and trends.",
-                    allContinents: "All Continents",
-                    allAirlines: "All Airlines",
-                    insightTitle: "💡 Insight of the Day",
-                    aiTitle: "🤖 Predictive Analysis",
-                    aiPrediction: "AI predicts an 18% traffic increase in Asia-Pacific by 2026 (Confidence: 92%).",
-                    covidTimelineTitle: "COVID Impact & Air Traffic Forecast",
+                    allContinents: "All Continents", allAirlines: "All Airlines",
+                    insightTitle: "💡 Dynamic Insight", aiTitle: "🤖 Predictive Analysis",
+                    top10Airlines: "Top 10 Airlines (by routes)", top10Airports: "Top 10 Airports (Hubs)",
+                    routesByContinent: "Distribution by Continent",
                     achievementExplorer: "Badge unlocked: Data Explorer!",
                     achievementAnalyst: "Badge unlocked: Expert Analyst!",
                     achievementDetective: "Badge unlocked: Data Detective!",
                 }
             };
-
-            const insights = {
-                fr: [
-                    "Plus de 50% des routes analysées impliquent un aéroport en Europe ou en Amérique du Nord.",
-                    "La route la plus longue de ce jeu de données pourrait faire 17 fois le tour de la lune.",
-                    "Certaines petites compagnies n'opèrent qu'une seule route, reliant des communautés isolées.",
-                    "Le nombre de routes aériennes a plus que doublé dans le monde au cours des 20 dernières années.",
-                ],
-                en: [
-                    "Over 50% of analyzed routes involve an airport in Europe or North America.",
-                    "The longest route in this dataset could circle the moon 17 times.",
-                    "Some small airlines operate only a single route, connecting isolated communities.",
-                    "The number of air routes worldwide has more than doubled in the last 20 years.",
-                ]
-            };
             
             // --- Utility Functions ---
             const animateCounter = (el, start, end, duration) => {
-                if (start === end) {
-                    el.innerText = end.toLocaleString('fr-FR');
-                    return;
-                };
+                if (!el || start === end) { if(el) el.innerText = end.toLocaleString('fr-FR'); return; };
                 let startTimestamp = null;
                 const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-                
                 const step = (timestamp) => {
                     if (!startTimestamp) startTimestamp = timestamp;
                     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    const easedProgress = easeOutCubic(progress);
-                    el.innerText = Math.floor(easedProgress * (end - start) + start).toLocaleString('fr-FR');
-                    
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    } else {
-                        el.innerText = end.toLocaleString('fr-FR');
-                    }
+                    el.innerText = Math.floor(easeOutCubic(progress) * (end - start) + start).toLocaleString('fr-FR');
+                    if (progress < 1) window.requestAnimationFrame(step); else el.innerText = end.toLocaleString('fr-FR');
                 };
                 window.requestAnimationFrame(step);
             };
@@ -761,42 +495,18 @@
             const translatePage = () => {
                 document.querySelectorAll('[data-key]').forEach(el => {
                     const key = el.dataset.key;
-                    if (translations[currentLang][key]) {
-                        el.innerText = translations[currentLang][key];
-                    }
+                    if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
                 });
                 if(continentSelect.options.length > 0) continentSelect.options[0].text = translations[currentLang].allContinents;
                 if(airlineSelect.options.length > 0) airlineSelect.options[0].text = translations[currentLang].allAirlines;
-                aiPredictionTextEl.innerText = translations[currentLang].aiPrediction;
-                if(analyticsChart) analyticsChart.setOption({ title: { text: translations[currentLang].covidTimelineTitle } });
-            };
-            
-            const typeWriter = (el, text) => {
-                let i = 0;
-                el.innerHTML = "";
-                const speed = 30;
-                function type() {
-                    if (i < text.length) {
-                        el.innerHTML += text.charAt(i);
-                        i++;
-                        setTimeout(type, speed);
-                    }
-                }
-                type();
-            };
-
-            const showInsight = () => {
-                const randomInsight = insights[currentLang][Math.floor(Math.random() * insights[currentLang].length)];
-                typeWriter(insightTextEl, randomInsight);
+                updateAnalyticsChartsTitles();
             };
 
             const unlockAchievement = (id) => {
                 if(achievements[id]) return;
                 achievements[id] = true;
-                
                 const badge = document.getElementById(`badge-${id}`);
                 if(badge) badge.classList.add('unlocked');
-
                 const toast = document.createElement('div');
                 toast.className = 'achievement-toast';
                 toast.textContent = `🏆 ${translations[currentLang]['achievement' + id.charAt(0).toUpperCase() + id.slice(1)]}`;
@@ -806,8 +516,7 @@
 
             // --- Data Processing ---
             const num = v => v==null || v==="" ? NaN : parseFloat(String(v).replace(',', '.'));
-
-            function continentByLatLon(lat, lon){
+            const continentByLatLon = (lat, lon) => {
                 if (isNaN(lat) || isNaN(lon)) return 'World';
                 if (-60<=lat && lat<=12 && -82<=lon && lon<=-34) return 'South America';
                 if (  7<=lat && lat<=84 && -170<=lon && lon<=-50) return 'North America';
@@ -817,194 +526,135 @@
                 if (-50<=lat && lat<= 0 && 110<=lon && lon<=180) return 'Oceania';
                 return 'World';
             }
-
-            const FIELD = {
-                airline:       ['airline','carrier','airline_code'],
-                src_iata:      ['src_iata','source_iata','origin','from_iata','src_code'],
-                dst_iata:      ['dst_iata','destination_iata','to_iata','dst_code'],
-                src_latitude:  ['src_latitude','src_lat','source_latitude','from_lat'],
-                src_longitude: ['src_longitude','src_lon','source_longitude','from_lon'],
-                dst_latitude:  ['dst_latitude','dst_lat','destination_latitude','to_lat'],
-                dst_longitude: ['dst_longitude','dst_lon','destination_longitude','to_lon'],
-                src_city:      ['src_city','origin_city'],
-                dst_city:      ['dst_city','destination_city'],
-                src_country:   ['src_country','origin_country'],
-                dst_country:   ['dst_country','destination_country'],
-                distance_km:   ['distance_km','distance','km'],
-                route_key:     ['route_key','route','od','origin_dest']
-            };
-            const pick = (row, keys)=> keys.find(k => row[k]!=null && row[k]!=='' ) ? row[keys.find(k=>row[k]!=null && row[k]!=='' )] : null;
-
-            function processData(rows){
-                return rows.map(row => {
-                const src_lat = num(pick(row, FIELD.src_latitude));
-                const src_lon = num(pick(row, FIELD.src_longitude));
-                const dst_lat = num(pick(row, FIELD.dst_latitude));
-                const dst_lon = num(pick(row, FIELD.dst_longitude));
-                const airline = pick(row, FIELD.airline) || 'UNK';
-                const src_iata = pick(row, FIELD.src_iata) || '';
-                const dst_iata = pick(row, FIELD.dst_iata) || '';
-                const rk = pick(row, FIELD.route_key) || `${src_iata} → ${dst_iata}`;
-
+            const processData = rows => rows.map(row => {
+                const src_lat = num(row.src_latitude), src_lon = num(row.src_longitude);
+                const dst_lat = num(row.dst_latitude), dst_lon = num(row.dst_longitude);
                 return {
-                    airline, src_iata, dst_iata,
+                    airline: row.airline || 'UNK', src_iata: row.src_iata || '', dst_iata: row.dst_iata || '',
                     src_lat, src_lon, dst_lat, dst_lon,
                     src_continent: continentByLatLon(src_lat, src_lon),
                     dst_continent: continentByLatLon(dst_lat, dst_lon),
-                    distance_km: num(pick(row, FIELD.distance_km)),
-                    route_key: rk
+                    distance_km: num(row.distance_km), route_key: row.route_key || `${row.src_iata}→${row.dst_iata}`
                 };
-                }).filter(r =>
-                !isNaN(r.src_lat) && !isNaN(r.src_lon) && !isNaN(r.dst_lat) && !isNaN(r.dst_lon)
-                );
-            }
+            }).filter(r => !isNaN(r.src_lat) && !isNaN(r.src_lon) && !isNaN(r.dst_lat) && !isNaN(r.dst_lon));
+            
+            const updateDynamicContent = (data) => {
+                const avgDist = data.length ? Math.round(data.filter(d=>d.distance_km).reduce((s,d)=>s+d.distance_km,0)/data.length) : 0;
+                insightTextEl.textContent = currentLang === 'fr' ? `Distance moyenne des routes affichées: ${avgDist.toLocaleString('fr-FR')} km.` : `Average distance for displayed routes: ${avgDist.toLocaleString('en-US')} km.`;
+                const selectedContinent = continentSelect.value;
+                let prediction = "";
+                if (selectedContinent === 'all' || selectedContinent === 'Asia') prediction = currentLang === 'fr' ? "L'IA prévoit +18% de trafic en Asie-Pacifique d'ici 2026." : "AI predicts an 18% traffic increase in Asia-Pacific by 2026.";
+                else if (selectedContinent === 'Europe') prediction = currentLang === 'fr' ? "L'IA détecte une consolidation des hubs européens majeurs." : "AI detects a consolidation of major European hubs.";
+                else prediction = currentLang === 'fr' ? "L'IA identifie un potentiel sur les routes transatlantiques." : "AI identifies growth potential on transatlantic routes.";
+                aiPredictionTextEl.textContent = prediction;
+            };
 
-            function calculateKPIs(data){
+            const calculateKPIs = (data) => {
                 const totalRoutes = data.length;
                 const activeAirlines = new Set(data.map(r=>r.airline)).size;
-                
-                const counts = data.reduce((acc, r) => {
-                    acc.airlines[r.airline] = (acc.airlines[r.airline] || 0) + 1;
-                    acc.routes[r.route_key] = (acc.routes[r.route_key] || 0) + 1;
-                    return acc;
-                }, { airlines: {}, routes: {} });
-
-                const topAirlineData = Object.entries(counts.airlines).sort((a,b) => b[1] - a[1])[0] || ['-', 0];
-                const busiestRoute = Object.keys(counts.routes).sort((a,b)=>counts.routes[b]-counts.routes[a])[0] || '-';
-                const longestRouteData = [...data].sort((a,b) => (b.distance_km || 0) - (a.distance_km || 0))[0];
-
+                const airlineCounts = data.reduce((acc, r) => { acc[r.airline] = (acc[r.airline] || 0) + 1; return acc; }, {});
+                const topAirline = Object.entries(airlineCounts).sort((a,b) => b[1] - a[1])[0] || ['-'];
+                const airportCounts = data.reduce((acc, r) => { acc[r.src_iata] = (acc[r.src_iata] || 0) + 1; acc[r.dst_iata] = (acc[r.dst_iata] || 0) + 1; return acc; }, {});
+                const busiestAirport = Object.entries(airportCounts).sort((a,b) => b[1] - a[1])[0] || ['-'];
                 animateCounter(document.getElementById('total-routes'), 0, totalRoutes, 1200);
                 animateCounter(document.getElementById('active-airlines'), 0, activeAirlines, 1200);
-                document.getElementById('top-airline').innerText = topAirlineData[0];
-                document.getElementById('busiest-route').innerText = busiestRoute;
-                if (longestRouteData) {
-                    document.getElementById('longest-route').innerText = `${Math.round(longestRouteData.distance_km).toLocaleString('fr-FR')} km`;
-                }
-            }
+                document.getElementById('top-airline').innerText = topAirline[0];
+                document.getElementById('busiest-airport').innerText = busiestAirport[0];
+            };
 
-            function populateFilters(data){
+            const populateFilters = (data) => {
                 const airlines = [...new Set(data.map(r => r.airline))].sort();
-                airlineSelect.innerHTML = `<option value="all">${translations[currentLang].allAirlines}</option>`
-                + airlines.map(a=>`<option value="${a}">${a}</option>`).join('');
-                
-                const conts = [...new Set(data.flatMap(r => [r.src_continent, r.dst_continent]).filter(Boolean))].sort();
-                continentSelect.innerHTML = `<option value="all">${translations[currentLang].allContinents}</option>`
-                + conts.map(c=>`<option value="${c}">${c}</option>`).join('');
-            }
+                airlineSelect.innerHTML = `<option value="all">${translations[currentLang].allAirlines}</option>` + airlines.map(a=>`<option value="${a}">${a}</option>`).join('');
+                const conts = [...new Set(data.flatMap(r => [r.src_continent, r.dst_continent]).filter(c => c && c !== 'World'))].sort();
+                continentSelect.innerHTML = `<option value="all">${translations[currentLang].allContinents}</option>` + conts.map(c=>`<option value="${c}">${c}</option>`).join('');
+            };
             
-            function getFilteredData(){
+            const getFilteredData = () => {
                 const a = airlineSelect.value;
                 const c = continentSelect.value;
                 if( a !== 'all' || c !== 'all') unlockAchievement('explorer');
-                return allRoutesData.filter(r=>{
-                    const okA = (a==='all') || (r.airline===a);
-                    const okC = (c==='all') || r.src_continent===c || r.dst_continent===c;
-                    return okA && okC;
-                });
-            }
+                return allRoutesData.filter(r => ((a==='all')||(r.airline===a)) && ((c==='all')||r.src_continent===c||r.dst_continent===c));
+            };
 
             // --- Charting ---
             const initCharts = () => {
                 mapChart = echarts.init(mapChartEl);
-                analyticsChart = echarts.init(analyticsChartEl);
+                topAirlinesChart = echarts.init(topAirlinesChartEl);
+                topAirportsChart = echarts.init(topAirportsChartEl);
+                continentPieChart = echarts.init(continentPieChartEl);
             };
             
-            function updateMapChart(data){
-                const routesToDisplay = godView ? data : data.slice(0, 600);
-                const lines = routesToDisplay.map(r=>({
-                name: `${r.airline} | ${r.route_key}${r.distance_km?` • ${Math.round(r.distance_km)} km`:''}`,
-                coords: [[r.src_lon, r.src_lat],[r.dst_lon, r.dst_lat]]
-                }));
-                const dots = [
-                    ...routesToDisplay.map(r=>({name:`${r.src_iata}`, value:[r.src_lon,r.src_lat]})),
-                    ...routesToDisplay.map(r=>({name:`${r.dst_iata}`, value:[r.dst_lon,r.dst_lat]})),
-                ];
-
+            const updateMapChart = data => {
+                const routesToDisplay = godView ? data : data.slice(0, 800);
+                const lines = routesToDisplay.map(r=>({ name: `${r.airline} | ${r.route_key}${r.distance_km?` • ${Math.round(r.distance_km)} km`:''}`, coords: [[r.src_lon, r.src_lat],[r.dst_lon, r.dst_lat]] }));
+                const dots = [...routesToDisplay.map(r=>({name: r.src_iata, value:[r.src_lon,r.src_lat]})), ...routesToDisplay.map(r=>({name: r.dst_iata, value:[r.dst_lon,r.dst_lat]}))];
                 mapChart.setOption({
-                    backgroundColor:'transparent',
-                    tooltip:{ trigger:'item' },
-                    geo:{
-                        map:'world', roam:true,
-                        itemStyle:{ areaColor:'rgba(10,25,41,1)', borderColor:'rgba(0,188,212,.25)'},
-                        emphasis:{ itemStyle:{ areaColor:'#14324a'} }
-                    },
+                    backgroundColor:'transparent', tooltip:{ trigger:'item' },
+                    geo:{ map:'world', roam:true, itemStyle:{ areaColor:'rgba(10,25,41,1)', borderColor:'rgba(0,188,212,.25)'}, emphasis:{ itemStyle:{ areaColor:'#14324a'} } },
                     series:[
-                        { type:'lines', coordinateSystem:'geo', data:lines, zlevel:1,
-                        effect:{ show:true, period:6, trailLength:0.1, symbol:'arrow', symbolSize:5 },
-                        lineStyle:{ width:1, opacity:0.45, curveness:0.2,
-                            color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,188,212,.6)'},{offset:1,color:'rgba(100,181,246,.6)'}])
-                        }
-                        },
-                        { type:'scatter', coordinateSystem:'geo', data:dots, symbolSize:3,
-                        itemStyle:{ color:'rgba(0,188,212,.85)'}, zlevel:2 }
+                        { type:'lines', coordinateSystem:'geo', data:lines, zlevel:1, effect:{ show:true, period:6, trailLength:0.1, symbol:'arrow', symbolSize:5 }, lineStyle:{ width:1, opacity:0.45, curveness:0.2, color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,188,212,.6)'},{offset:1,color:'rgba(100,181,246,.6)'}]) } },
+                        { type:'scatter', coordinateSystem:'geo', data:dots, symbolSize:3, itemStyle:{ color:'rgba(0,188,212,.85)'}, zlevel:2 }
                     ]
                 }, { notMerge: true });
-            }
+            };
             
-            function initAnalyticsTimeline() {
-                 const timelineData = {
-                    '2019': { value: 100, label: 'Pic pré-COVID' },
-                    '2020': { value: 36, label: 'Chute (-64%)' },
-                    '2021': { value: 52, label: 'Reprise Lente' },
-                    '2022': { value: 75, label: 'Frontières Ouvertes' },
-                    '2023': { value: 91, label: 'Quasi-Normal' },
-                    '2024': { value: 105, label: 'Croissance' },
-                    '2025': { value: 115, label: 'Prédiction IA' }
-                };
+            const updateAnalyticsCharts = data => {
+                const totalRoutesInSelection = data.length || 1;
 
-                const option = {
-                    title: {
-                        text: translations[currentLang].covidTimelineTitle,
-                        left: 'center',
-                        textStyle: { color: 'var(--text-white)' }
-                    },
-                    tooltip: { trigger: 'axis' },
-                    xAxis: {
-                        type: 'category',
-                        data: Object.keys(timelineData)
-                    },
-                    yAxis: {
-                        type: 'value',
-                        name: 'Indice de trafic (Base 100 = 2019)',
-                        min: 0,
-                        max: 120
-                    },
-                    series: [{
-                        data: Object.values(timelineData).map(d => d.value),
-                        type: 'bar',
-                        barWidth: '40%',
-                        itemStyle: {
-                            color: (params) => params.name >= 2024 ? 'var(--accent-green)' : 'var(--accent-cyan)'
-                        },
-                        markPoint: {
-                            symbolSize: 60,
-                            data: [
-                                { name: 'Point le plus bas', value: 'Chute', xAxis: '2020', yAxis: 36 },
-                                { name: 'Prédiction', value: 'Futur', xAxis: '2025', yAxis: 115 }
-                            ]
-                        },
-                        markLine: {
-                            data: [{ name: 'Niveau pré-COVID', yAxis: 100 }]
-                        }
-                    }]
-                };
-                analyticsChart.setOption(option);
-            }
-            
+                const airlineCounts = data.reduce((acc, r) => { acc[r.airline] = (acc[r.airline] || 0) + 1; return acc; }, {});
+                const topAirlines = Object.entries(airlineCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).reverse();
+                topAirlinesChart.setOption({
+                    title: { text: translations[currentLang].top10Airlines, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: p => `${p[0].name}<br/>${p[0].value.toLocaleString()} routes (${(p[0].value/totalRoutesInSelection*100).toFixed(1)}%)` },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'value', axisLine: { lineStyle: { color: '#8892b0' } }, splitLine: { lineStyle: { color: 'rgba(136, 146, 176, 0.1)' } } },
+                    yAxis: { type: 'category', data: topAirlines.map(a => a[0]), axisLine: { show: true, lineStyle: { color: '#8892b0' } } },
+                    series: [{ data: topAirlines.map(a => a[1]), type: 'bar', itemStyle: { color: 'var(--accent-cyan)' } }]
+                });
+
+                const airportCounts = data.reduce((acc, r) => { acc[r.src_iata] = (acc[r.src_iata] || 0) + 1; acc[r.dst_iata] = (acc[r.dst_iata] || 0) + 1; return acc; }, {});
+                const topAirports = Object.entries(airportCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).reverse();
+                topAirportsChart.setOption({
+                    title: { text: translations[currentLang].top10Airports, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: p => `${p[0].name}<br/>${p[0].value.toLocaleString()} connexions` },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'value', axisLine: { lineStyle: { color: '#8892b0' } }, splitLine: { lineStyle: { color: 'rgba(136, 146, 176, 0.1)' } } },
+                    yAxis: { type: 'category', data: topAirports.map(a => a[0]), axisLine: { show: true, lineStyle: { color: '#8892b0' } } },
+                    series: [{ data: topAirports.map(a => a[1]), type: 'bar', itemStyle: { color: 'var(--accent-blue)' } }]
+                });
+
+                const continentCounts = data.reduce((acc, r) => { if (r.src_continent !== 'World') acc[r.src_continent] = (acc[r.src_continent] || 0) + 1; return acc; }, {});
+                const pieData = Object.entries(continentCounts).map(([name, value]) => ({name, value}));
+                continentPieChart.setOption({
+                    title: { text: translations[currentLang].routesByContinent, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'item', formatter: '{b}: {c} routes ({d}%)' },
+                    legend: { orient: 'vertical', left: 'left', textStyle: { color: 'var(--text-white)' } },
+                    series: [{ type: 'pie', radius: '50%', data: pieData, emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } } }]
+                });
+            };
+
+            const updateAnalyticsChartsTitles = () => {
+                if(topAirlinesChart?.getOption()) topAirlinesChart.setOption({ title: { text: translations[currentLang].top10Airlines } });
+                if(topAirportsChart?.getOption()) topAirportsChart.setOption({ title: { text: translations[currentLang].top10Airports } });
+                if(continentPieChart?.getOption()) continentPieChart.setOption({ title: { text: translations[currentLang].routesByContinent } });
+            };
+
             // --- Event Handlers ---
             const handleFilterChange = () => {
                 const filteredData = getFilteredData();
                 updateMapChart(filteredData);
                 calculateKPIs(filteredData);
+                updateAnalyticsCharts(filteredData);
+                updateDynamicContent(filteredData);
             };
 
             const handleTabClick = (isMap) => {
                 tabMap.classList.toggle('active', isMap);
                 tabAnalytics.classList.toggle('active', !isMap);
                 mapChartEl.classList.toggle('hidden', !isMap);
-                analyticsChartEl.classList.toggle('hidden', isMap);
+                document.getElementById('analytics-container').parentElement.classList.toggle('hidden', isMap);
                 if(!isMap) {
-                    analyticsChart.resize();
+                    [topAirlinesChart, topAirportsChart, continentPieChart].forEach(c => c.resize());
                     unlockAchievement('analyst');
                 }
             };
@@ -1023,81 +673,65 @@
                         setTimeout(() => banner.remove(), 3000);
                         handleFilterChange();
                     }
-                } else {
-                    konamiIndex = 0;
-                }
+                } else { konamiIndex = 0; }
             };
 
             const createDemoSequence = () => {
-                resetFiltersBtn.click();
-                mapChart.dispatchAction({ type: 'restore' });
-
-                setTimeout(() => {
-                    mapChart.dispatchAction({ type: 'geoRoam', zoom: 1.5, roam: 'move', dx: -200, dy: 100 });
-                }, 1000);
-                
-                setTimeout(() => tabAnalytics.click(), 3000);
-                setTimeout(() => tabMap.click(), 5000);
-                setTimeout(() => mapChart.dispatchAction({ type: 'restore' }), 7000);
+                const wait = ms => new Promise(res => setTimeout(res, ms));
+                const sequence = async () => {
+                    resetFiltersBtn.click(); await wait(2000);
+                    continentSelect.value = 'Europe'; continentSelect.dispatchEvent(new Event('change')); await wait(2000);
+                    tabAnalytics.click(); await wait(2000);
+                    continentSelect.value = 'Asia'; continentSelect.dispatchEvent(new Event('change')); await wait(2000);
+                    tabMap.click(); await wait(1000);
+                    resetFiltersBtn.click();
+                };
+                sequence();
             };
 
             const main = async () => {
                 initCharts();
                 translatePage();
-                showInsight();
-
+                
                 tabMap.addEventListener('click', () => handleTabClick(true));
                 tabAnalytics.addEventListener('click', () => handleTabClick(false));
-                airlineSelect.addEventListener('change', handleFilterChange);
-                continentSelect.addEventListener('change', handleFilterChange);
-                resetFiltersBtn.addEventListener('click', () => {
-                    airlineSelect.value = 'all';
-                    continentSelect.value = 'all';
-                    handleFilterChange();
-                    mapChart.dispatchAction({ type: 'restore' });
-                });
-                langToggle.addEventListener('click', () => {
-                    currentLang = currentLang === 'fr' ? 'en' : 'fr';
-                    document.getElementById('lang-fr').style.opacity = currentLang === 'fr' ? '1' : '0.5';
-                    document.getElementById('lang-en').style.opacity = currentLang === 'en' ? '1' : '0.5';
-                    translatePage();
-                    showInsight();
-                });
+                [airlineSelect, continentSelect].forEach(el => el.addEventListener('change', handleFilterChange));
+                resetFiltersBtn.addEventListener('click', () => { airlineSelect.value = 'all'; continentSelect.value = 'all'; handleFilterChange(); mapChart.dispatchAction({ type: 'restore' }); });
+                document.getElementById('lang-toggle').addEventListener('click', () => { currentLang = currentLang === 'fr' ? 'en' : 'fr'; document.getElementById('lang-fr').style.opacity = currentLang === 'fr' ? '1' : '0.5'; document.getElementById('lang-en').style.opacity = currentLang === 'en' ? '1' : '0.5'; translatePage(); updateDynamicContent(getFilteredData()); });
+                demoBtn.addEventListener('click', createDemoSequence);
                 exportPdfBtn.addEventListener('click', () => {
-                    const dashboard = document.getElementById('main-dashboard');
-                    html2canvas(dashboard, { backgroundColor: '#0a1929' }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const dashboard = document.getElementById('dashboard-content');
+                    loadingOverlay.classList.remove('hidden');
+                    html2canvas(dashboard, { backgroundColor: '#0a1929', useCORS: true, scale: 2 }).then(canvas => {
                         const imgData = canvas.toDataURL('image/png');
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('l', 'px', [canvas.width, canvas.height]);
+                        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
                         pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-                        pdf.save("airflow-dashboard.pdf");
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(150);
+                        pdf.text('AirFlow Dynamics - Rapport Généré', 20, canvas.height - 20);
+                        pdf.text(new Date().toLocaleDateString('fr-FR'), canvas.width - 80, canvas.height - 20);
+                        pdf.save(`AirFlow_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+                        loadingOverlay.classList.add('hidden');
                     });
                 });
-                demoBtn.addEventListener('click', createDemoSequence);
                 window.addEventListener('keydown', handleKonamiCode);
-                window.addEventListener('resize', () => {
-                    mapChart.resize();
-                    analyticsChart.resize();
-                });
+                window.addEventListener('resize', () => { mapChart.resize(); topAirlinesChart.resize(); topAirportsChart.resize(); continentPieChart.resize(); });
 
                 try {
                     const response = await fetch('./routes_front_plus.csv');
                     const csvText  = await response.text();
                     const parsed   = Papa.parse(csvText, { skipEmptyLines:true, header:true, delimiter:"," });
                     allRoutesData  = processData(parsed.data);
-
                     populateFilters(allRoutesData);
-                    calculateKPIs(allRoutesData);
-                    updateMapChart(allRoutesData);
-                    initAnalyticsTimeline();
+                    handleFilterChange();
                 } catch(e){
-                    console.error(e);
-                    alert("Impossible de charger les données de vol.");
+                    console.error("Erreur de chargement des données:", e);
+                    alert("Impossible de charger les données de vol. Veuillez vérifier le fichier et la console.");
                 } finally {
                     loadingOverlay.classList.add('hidden');
                 }
             };
-
             main();
         });
     </script>
