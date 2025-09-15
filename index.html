@@ -1,469 +1,1039 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>AirFlow Dynamics — Global Air Traffic Intelligence</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirFlow Dynamics - Global Air Traffic Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg-dark: #0a1929;
+            --bg-card: rgba(10, 25, 41, 0.5);
+            --accent-cyan: #00bcd4;
+            --accent-blue: #64b5f6;
+            --text-white: #e6f1ff;
+            --text-muted: #8892b0;
+            --border-color: rgba(0, 188, 212, 0.2);
+        }
 
-  <!-- Libs -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/echarts-gl@2/dist/echarts-gl.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/echarts@5/map/js/world.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <style>
-    :root{
-      color-scheme: dark;
-      --bg:#0a1929; --bg2:#071421;
-      --card:rgba(255,255,255,.06); --card2:rgba(255,255,255,.04);
-      --text:#e6f1ff; --muted:#8aa0bf;
-      --accent:#00bcd4; --accent2:#64b5f6;
-      --border:rgba(255,255,255,.09);
-      --dropdown:#0e2236;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--text); font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-      background:
-        radial-gradient(1100px 600px at 20% -10%, #173957 0%, transparent 60%),
-        radial-gradient(900px 500px at 110% 0%, #0b2a3f 0%, transparent 60%),
-        linear-gradient(180deg, var(--bg) 0%, #02070e 100%);
-      overflow-x:hidden; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    }
-    .container{max-width:1320px;margin:0 auto;padding:24px}
-    .header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#0f3b4c,#12354a);box-shadow:0 6px 20px rgba(0,0,0,.35)}
-    .title{line-height:1.1;font-size:26px;font-weight:900;letter-spacing:.2px}
-    .subtitle{font-size:13px;color:var(--muted)}
-    .badges{display:flex;gap:8px;flex-wrap:wrap}
-    .badge{background:var(--card);border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+        html {
+            scroll-behavior: smooth;
+        }
 
-    .controls{display:flex;gap:8px;align-items:center}
-    .btn{border:1px solid var(--border);background:var(--card);color:var(--text);
-      border-radius:12px;padding:10px 12px;cursor:pointer;transition:.2s}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(0,0,0,.25)}
-    .btn.primary{background:linear-gradient(135deg,#0f3b4c,#00798f);border-color:#14596a}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(ellipse at top left, rgba(0, 188, 212, 0.1), transparent 50%),
+                              radial-gradient(ellipse at bottom right, rgba(100, 181, 246, 0.1), transparent 50%);
+            z-index: -1;
+        }
 
-    .tabs{display:flex;gap:8px;margin-top:12px}
-    .tab{padding:10px 14px;border-radius:999px;background:var(--card);border:1px solid transparent;cursor:pointer}
-    .tab.active{background:linear-gradient(135deg,#0f3b4c,#00bcd4);color:#031218;border-color:#1e6272}
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem;
+            position: relative;
+            z-index: 1;
+        }
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px;
-      box-shadow:0 18px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(10px)}
-    .section-title{font-size:22px;font-weight:900;margin:0 0 10px}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-    .f-group{min-width:220px}
-    .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    select{
-      width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);color:var(--text);
-      background:radial-gradient(120% 120% at 0% 0%, rgba(0,188,212,.08) 0%, rgba(10,25,41,.75) 60%);
-      outline:none; appearance:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2300bcd4' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:right 12px center;
-    }
-    select:focus{box-shadow:0 0 0 3px rgba(0,188,212,.25)}
-    /* ✅ lisible quand le menu s’ouvre */
-    select, option{ background-color:var(--dropdown)!important; color:var(--text)!important; }
-    option:checked{ background-color:#11425a!important; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-    .grid{display:grid;gap:16px}
-    @media(min-width:1000px){ .grid-2{grid-template-columns:2fr 1fr} }
+        .logo svg {
+            width: 40px;
+            height: 40px;
+            color: var(--accent-cyan);
+        }
 
-    .chart{height:420px}
-    .caption{font-size:12px;color:var(--muted);margin-top:6px}
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
 
-    .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-    .kpi{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:14px}
-    .kpi .k{font-size:12px;color:var(--muted)}
-    .kpi .v{font-size:22px;font-weight:900;
-      background:linear-gradient(90deg,var(--accent) 0%, var(--accent2) 100%);
-      -webkit-background-clip:text;background-clip:text;color:transparent}
+        .logo-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: -5px;
+        }
+        
+        .main-nav {
+            display: flex;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 99px;
+            backdrop-filter: blur(10px);
+            padding: 0.25rem;
+        }
 
-    .insights{display:grid;gap:8px}
-    .tag{display:inline-flex;gap:6px;align-items:center;padding:8px 10px;border-radius:999px;
-      background:rgba(0,188,212,.08);border:1px solid rgba(0,188,212,.25);font-size:12px;color:#cfefff}
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
 
-    .legend-map{display:flex;gap:12px;align-items:center;font-size:12px;color:var(--muted);margin-top:8px}
-    .dot{width:10px;height:10px;border-radius:50%;background:rgba(0,188,212,.9);display:inline-block}
-    .line{width:26px;height:2px;background:linear-gradient(90deg,rgba(0,188,212,.7),rgba(100,181,246,.7));display:inline-block}
+        .nav-tab.active, .nav-tab:hover {
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+        }
 
-    .footer{color:var(--muted);text-align:center;margin:24px 0 8px}
-    .loading{position:fixed;inset:0;background:rgba(3,12,22,.8);display:grid;place-items:center;z-index:20}
-    .spinner{width:48px;height:48px;border-radius:50%;border:7px solid; border-color:#0000 var(--accent);
-      animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(180deg)}}
-  </style>
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-white);
+            cursor: pointer;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem;
+        }
+
+        .lang-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,188,212,0.3);
+            border-radius: 8px;
+        }
+        
+        .btn {
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 188, 212, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .filters-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            flex-grow: 1;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-select {
+            width: 100%;
+            background-color: rgba(10, 25, 41, 0.8);
+            color: var(--text-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2300bcd4' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        
+        select option {
+            background: var(--bg-dark);
+            color: var(--text-white);
+        }
+        
+        .filter-select:hover {
+            background: rgba(0,188,212,0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,188,212,0.3);
+            transform: scale(1.02);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,188,212,0.1);
+            box-shadow: none;
+            transform: translateY(0);
+        }
+        
+        #chart-container {
+            min-height: 600px;
+            position: relative;
+        }
+
+        .chart {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 1;
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            transform: scale(1);
+        }
+
+        .chart.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.98);
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+            border-width: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .metric-icon {
+            font-size: 1.75rem;
+            color: var(--accent-cyan);
+            opacity: 0.7;
+            padding-right: 1rem;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            min-height: 1.2rem;
+            line-height: 1.2rem;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(10, 25, 41, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            width: 50px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 8px solid;
+            border-color: #0000 #00bcd4;
+            animation: l1 1s infinite;
+        }
+        @keyframes l1 {to{transform: rotate(.5turn)}}
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        
+        .god-view-banner {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark);
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            z-index: 9999;
+            animation: fadeInDown 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translate(-50%, -100%); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        @media (hover: hover) and (min-width: 1024px) {
+            .metric-card:hover {
+                transform: translateY(-4px) scale(1.02);
+                box-shadow: 0 15px 30px rgba(0,188,212,0.25);
+                border-color: var(--accent-cyan);
+                background: radial-gradient(circle at center, rgba(0,188,212,0.1) 0%, rgba(10, 25, 41, 0.5) 100%);
+            }
+
+            .metric-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -150%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+                transform: skewX(-25deg);
+                transition: left 0.75s;
+            }
+
+            .metric-card:hover::before {
+                left: 150%;
+            }
+
+            .metric-value:hover {
+                color: #fff;
+                text-shadow: 0 0 15px var(--accent-cyan);
+                transform: scale(1.05);
+                display: inline-block;
+            }
+        }
+        
+        @media (max-width: 1023px) {
+            .metric-card {
+                transition: none;
+            }
+        }
+        
+        #analytics-chart-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        @media (min-width: 768px) {
+            #analytics-chart-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .analytics-sub-chart {
+            width: 100%;
+            height: 300px;
+        }
+        
+        @media (min-width: 768px) {
+            #top-airlines-chart {
+                grid-column: 1 / 2;
+            }
+            #top-airports-chart {
+                grid-column: 2 / 3;
+            }
+            #continent-pie-chart {
+                grid-column: 1 / 3;
+                height: 350px;
+            }
+        }
+
+
+        /* Pimper les tabs + badges */
+        .main-nav { box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+        .nav-tab { letter-spacing:.2px; border:1px solid rgba(255,255,255,.08); }
+        .nav-tab.active { background:linear-gradient(135deg,#0f3b4c,#00bcd4); color:#02131b; }
+        /* Cartes + relief */
+        .card { box-shadow: 0 20px 50px rgba(2,6,12,.4), inset 0 1px 0 rgba(255,255,255,.04); }
+        .metric-card { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); }
+        /* KPI number gradient */
+        .metric-value {
+            background: linear-gradient(90deg,#00bcd4 0%,#64b5f6 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        /* Sélecteurs plus premium */
+        .filter-select {
+            background: radial-gradient(120% 120% at 0% 0%, rgba(0,188,212,.08) 0%, rgba(10,25,41,.8) 60%);
+            border-color: rgba(0,188,212,.25);
+        }
+        /* Transition d’apparition charts */
+        .chart { transition: opacity .4s ease, transform .4s ease; will-change: transform,opacity; }
+
+    </style>
 </head>
-
 <body>
-<div id="loading" class="loading"><div class="spinner"></div></div>
-
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <div class="brand">
-      <div class="logo">✈️</div>
-      <div>
-        <div class="title">AirFlow Dynamics</div>
-        <div class="subtitle">Global Air Traffic Intelligence • CSV</div>
-      </div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
     </div>
-    <div class="badges">
-      <div class="badge">Visual Synthesis</div>
-      <div class="badge">Detailed Analytics</div>
+    
+    <div id="dashboard-content" class="container">
+        <header class="header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.18 9.09C7.21 8.32 5.37 6.41 5.37 4.17 5.37 1.86 7.24 0 9.56 0c2.31 0 4.18 1.86 4.18 4.17 0 2.24-1.84 4.15-4.81 4.92L10.18 9.09zm11.32 7.27c-2.48-1.5-5.11-2.6-7.85-3.18l-1.9-4.86c3.27-.78 5.6-3.04 5.6-5.82C17.35 1.12 15.34 0 12.91 0s-4.44 1.12-4.44 2.5c0 2.78 2.33 5.04 5.6 5.82l-1.9 4.86c-2.74.58-5.37 1.68-7.85 3.18C1.55 17.81 0 19.86 0 22.1v.51c0 .81.6 1.48 1.39 1.48h21.22c.79 0 1.39-.67 1.39-1.48v-.51c0-2.24-1.55-4.29-4.25-5.74z"></path></svg>
+                <div>
+                    <h1 class="logo-text" data-key="title">AirFlow Dynamics</h1>
+                    <p class="logo-subtitle" data-key="subtitle">Global Air Traffic Intelligence</p>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <div class="nav-tab active" id="tab-map" data-key="visualSynthesis">Synthèse Visuelle</div>
+                <div class="nav-tab" id="tab-analytics" data-key="detailedAnalytics">Analyses Détaillées</div>
+            </nav>
+
+            <div class="controls">
+                <button class="lang-toggle" id="lang-toggle" title="Switch language">
+                    <span id="lang-fr">FR</span> / <span id="lang-en" style="opacity: 0.5;">EN</span>
+                </button>
+                <button class="btn" id="export-pdf-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                    <span data-key="exportPDF">Exporter en PDF</span>
+                </button>
+                <button class="btn btn-secondary" id="demo-btn" title="Run animation sequence for GIF capture">▶️ Demo</button>
+            </div>
+        </header>
+
+        <main id="main-dashboard" class="dashboard-grid">
+            <div class="main-content">
+                <div class="card filters-card">
+                    <div class="filter-group">
+                        <label for="continent-select" class="filter-label" data-key="continent">Continent</label>
+                        <select id="continent-select" class="filter-select">
+                            <option value="all">All Continents</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="airline-select" class="filter-label" data-key="airline">Compagnie</label>
+                        <select id="airline-select" class="filter-select">
+                            <option value="all">All Airlines</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" id="reset-filters-btn" data-key="resetFilters">Réinitialiser</button>
+                </div>
+                <div class="card" id="chart-container">
+                    <div id="map-chart" class="chart"></div>
+                    <div id="analytics-chart" class="chart hidden">
+                         <div id="analytics-chart-container">
+                            <div id="top-airlines-chart" class="analytics-sub-chart"></div>
+                            <div id="top-airports-chart" class="analytics-sub-chart"></div>
+                            <div id="continent-pie-chart" class="analytics-sub-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="card metric-card">
+                    <span class="metric-icon">✈️</span>
+                    <div>
+                        <p class="metric-label" data-key="totalRoutes">Routes Totales Analysées</p>
+                        <h2 id="total-routes" class="metric-value">0</h2>
+                        <p class="metric-subtext" data-key="fromOpenFlights">issues des données OpenFlights</p>
+                    </div>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-icon">🏢</span>
+                    <div>
+                        <p class="metric-label" data-key="activeAirlines">Compagnies Aériennes Actives</p>
+                        <h2 id="active-airlines" class="metric-value">0</h2>
+                        <p class="metric-subtext" data-key="inDataset">dans le jeu de données</p>
+                    </div>
+                </div>
+                <div class="card metric-card">
+                     <span class="metric-icon">🏆</span>
+                     <div>
+                        <p class="metric-label" data-key="topAirline">Compagnie Top 1</p>
+                        <h2 id="top-airline" class="metric-value">-</h2>
+                        <p id="top-airline-sub" class="metric-subtext" data-key="mostRoutes">le plus de routes</p>
+                     </div>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-icon">📍</span>
+                    <div>
+                        <p class="metric-label" data-key="busiestRoute">Route la Plus Fréquentée</p>
+                        <h2 id="busiest-route" class="metric-value">-</h2>
+                        <p class="metric-subtext" data-key="mostConnections">le plus de connexions</p>
+                    </div>
+                </div>
+                 <div class="card metric-card">
+                    <span class="metric-icon">📏</span>
+                    <div>
+                        <p class="metric-label" data-key="longestRoute">Route la plus Longue</p>
+                        <h2 id="longest-route" class="metric-value">0 km</h2>
+                        <p id="longest-route-sub" class="metric-subtext" data-key="longestDirect">le plus long vol direct</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+        
+        <footer class="footer">
+            <p data-key="footer">Vue d'ensemble data-driven (OpenFlights). KPIs, routes signatures et tendances.</p>
+        </footer>
     </div>
-    <div class="controls">
-      <button id="btn-fr" class="btn">FR</button>
-      <button id="btn-en" class="btn">EN</button>
-      <button id="btn-pdf" class="btn primary">Export PDF</button>
-    </div>
-  </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const mapChartEl = document.getElementById('map-chart');
+            const analyticsChartEl = document.getElementById('analytics-chart');
+            const topAirlinesChartEl = document.getElementById('top-airlines-chart');
+            const topAirportsChartEl = document.getElementById('top-airports-chart');
+            const continentPieChartEl = document.getElementById('continent-pie-chart');
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" data-tab="visual">Visual Synthesis</div>
-    <div class="tab" data-tab="analytics">Detailed Analytics</div>
-  </div>
+            const tabMap = document.getElementById('tab-map');
+            const tabAnalytics = document.getElementById('tab-analytics');
+            const continentSelect = document.getElementById('continent-select');
+            const airlineSelect = document.getElementById('airline-select');
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            const exportPdfBtn = document.getElementById('export-pdf-btn');
+            const langToggle = document.getElementById('lang-toggle');
+            const demoBtn = document.getElementById('demo-btn');
 
-  <!-- Filters -->
-  <div class="card" style="margin-top:12px">
-    <div class="filters">
-      <div class="f-group">
-        <div class="label" data-i18n="continent">Continent</div>
-        <select id="continent">
-          <option value="all" data-i18n="allContinents">Tous les continents</option>
-        </select>
-      </div>
-      <div class="f-group">
-        <div class="label" data-i18n="airline">Compagnie</div>
-        <select id="airline">
-          <option value="all" data-i18n="allAirlines">Toutes les compagnies</option>
-        </select>
-      </div>
-      <div style="flex:1"></div>
-      <button id="btn-reset" class="btn">Reset</button>
-    </div>
-  </div>
+            // --- ECharts Instances ---
+            let mapChart, topAirlinesChart, topAirportsChart, continentPieChart;
+            
+            // --- State ---
+            let allRoutesData = [];
+            let currentLang = 'fr';
+            let godView = false;
+            const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+            let konamiIndex = 0;
 
-  <!-- Visual -->
-  <div id="view-visual" class="grid grid-2" style="margin-top:16px">
-    <div class="card">
-      <div class="section-title">Carte & Routes animées</div>
-      <div id="chart-map" class="chart"></div>
-      <div class="legend-map">
-        <span class="line"></span> Routes actives (animées)
-        <span class="dot"></span> Hubs / aéroports
-      </div>
-      <div class="caption">Astuce : zoomez/déplacez la carte. Les filtres impactent tous les graphiques.</div>
-    </div>
-    <div class="card">
-      <div class="section-title">KPIs</div>
-      <div class="kpis">
-        <div class="kpi"><div class="k">Compagnies</div><div id="k_airlines" class="v">–</div></div>
-        <div class="kpi"><div class="k">Routes</div><div id="k_routes" class="v">–</div></div>
-        <div class="kpi"><div class="k">Distance moyenne</div><div id="k_dist" class="v">–</div></div>
-        <div class="kpi"><div class="k">Pays couverts</div><div id="k_countries" class="v">–</div></div>
-        <div class="kpi"><div class="k">% Long-courrier</div><div id="k_long" class="v">–</div></div>
-      </div>
-      <div class="section-title" style="margin-top:14px">Insights</div>
-      <div id="insights" class="insights">
-        <!-- tags dynamiques -->
-      </div>
-    </div>
-  </div>
 
-  <!-- Analytics -->
-  <div id="view-analytics" class="card" style="margin-top:16px; display:none">
-    <div class="section-title">Analyses détaillées</div>
-    <div id="chart-analytics" class="chart"></div>
-    <div class="caption" id="analytics-caption">
-      Lisez la timeline en haut : <b>Top compagnies</b> → <b>Distribution des distances</b> → <b>Répartition par continent</b>.
-      Astuce : utilisez l’icône “tableau” pour voir les données sources, et “disquette” pour exporter l’image.
-    </div>
-  </div>
+            // --- Translations ---
+            const translations = {
+                fr: {
+                    title: "AirFlow Dynamics",
+                    subtitle: "Intelligence du Trafic Aérien Mondial",
+                    visualSynthesis: "Synthèse Visuelle",
+                    detailedAnalytics: "Analyses Détaillées",
+                    exportPDF: "Exporter en PDF",
+                    continent: "Continent",
+                    airline: "Compagnie",
+                    resetFilters: "Réinitialiser",
+                    totalRoutes: "Routes Totales Analysées",
+                    fromOpenFlights: "issues des données OpenFlights",
+                    activeAirlines: "Compagnies Aériennes Actives",
+                    inDataset: "dans le jeu de données",
+                    topAirline: "Compagnie Top 1",
+                    mostRoutes: "le plus de routes",
+                    busiestRoute: "Route la Plus Fréquentée",
+                    mostConnections: "le plus de connexions",
+                    longestRoute: "Route la plus Longue",
+                    longestDirect: "le plus long vol direct",
+                    footer: "Vue d'ensemble data-driven (OpenFlights). KPIs, routes signatures et tendances.",
+                    allContinents: "Tous les continents",
+                    allAirlines: "Toutes les compagnies",
+                    top10Airlines: "Top 10 Compagnies (par n° de routes)",
+                    top10Airports: "Top 10 Aéroports (les plus fréquentés)",
+                    routesByContinent: "Répartition des Routes par Continent"
+                },
+                en: {
+                    title: "AirFlow Dynamics",
+                    subtitle: "Global Air Traffic Intelligence",
+                    visualSynthesis: "Visual Synthesis",
+                    detailedAnalytics: "Detailed Analytics",
+                    exportPDF: "Export as PDF",
+                    continent: "Continent",
+                    airline: "Airline",
+                    resetFilters: "Reset",
+                    totalRoutes: "Total Routes Analyzed",
+                    fromOpenFlights: "from OpenFlights data",
+                    activeAirlines: "Active Airlines",
+                    inDataset: "in the dataset",
+                    topAirline: "Top #1 Airline",
+                    mostRoutes: "most routes",
+                    busiestRoute: "Busiest Route",
+                    mostConnections: "most connections",
+                    longestRoute: "Longest Route",
+                    longestDirect: "longest direct flight",
+                    footer: "Data-driven overview (OpenFlights). KPIs, route signatures and trends.",
+                    allContinents: "All Continents",
+                    allAirlines: "All Airlines",
+                    top10Airlines: "Top 10 Airlines (by # of routes)",
+                    top10Airports: "Top 10 Busiest Airports",
+                    routesByContinent: "Route Distribution by Continent"
+                }
+            };
+            
+            // --- Utility Functions ---
+            const animateCounter = (el, start, end, duration) => {
+                if (start === end) {
+                    el.innerText = end.toLocaleString('fr-FR');
+                    return;
+                };
+                let startTimestamp = null;
+                const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+                
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const easedProgress = easeOutCubic(progress);
+                    el.innerText = Math.floor(easedProgress * (end - start) + start).toLocaleString('fr-FR');
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        el.innerText = end.toLocaleString('fr-FR');
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+            
+            const translatePage = () => {
+                document.querySelectorAll('[data-key]').forEach(el => {
+                    const key = el.dataset.key;
+                    if (translations[currentLang][key]) {
+                        el.innerText = translations[currentLang][key];
+                    }
+                });
+                if(continentSelect.options.length > 0) continentSelect.options[0].text = translations[currentLang].allContinents;
+                if(airlineSelect.options.length > 0) airlineSelect.options[0].text = translations[currentLang].allAirlines;
+                updateAnalyticsChartsTitles();
+            };
 
-  <div class="footer">Data OpenFlights (échantillon). Racontez votre histoire avec filtres, légendes et annotations.</div>
-</div>
+            // --- Data Processing ---
+            const num = v => v==null || v==="" ? NaN : parseFloat(String(v).replace(',', '.'));
 
-<script>
-/* ====== I18N ====== */
-const I18N = {
-  fr: { continent:"Continent", airline:"Compagnie", allContinents:"Tous les continents", allAirlines:"Toutes les compagnies",
-        "Visual Synthesis":"Synthèse visuelle", "Detailed Analytics":"Analyses détaillées", "Export PDF":"Exporter PDF",
-        insights:{
-          topHub:"Hub principal",
-          corridor:"Corridor dominant",
-          median:"Médiane distance",
-          p90:"P90 distance",
-          longShare:"Long-courrier"
-        }},
-  en: { continent:"Continent", airline:"Airline", allContinents:"All Continents", allAirlines:"All Airlines",
-        "Visual Synthesis":"Visual Synthesis", "Detailed Analytics":"Detailed Analytics", "Export PDF":"Export PDF",
-        insights:{
-          topHub:"Top hub",
-          corridor:"Dominant corridor",
-          median:"Median distance",
-          p90:"P90 distance",
-          longShare:"Long-haul"
-        }}
-};
-let LANG = localStorage.getItem('lang') || 'fr';
-function t(key){ return (I18N[LANG]&&I18N[LANG][key]) || key; }
-function applyI18n(){
-  document.querySelectorAll('[data-i18n]').forEach(el=> el.textContent = t(el.dataset.i18n) );
-  document.getElementById('btn-pdf').textContent = t("Export PDF");
-}
+            function continentByLatLon(lat, lon){
+                if (isNaN(lat) || isNaN(lon)) return 'World';
+                if (-60<=lat && lat<=12 && -82<=lon && lon<=-34) return 'South America';
+                if (  7<=lat && lat<=84 && -170<=lon && lon<=-50) return 'North America';
+                if (-35<=lat && lat<=37 && -20<=lon && lon<= 52) return 'Africa';
+                if ( 35<=lat && lat<=71 && -25<=lon && lon<= 45) return 'Europe';
+                if ( -5<=lat && lat<=80 &&  46<=lon && lon<=180) return 'Asia';
+                if (-50<=lat && lat<= 0 && 110<=lon && lon<=180) return 'Oceania';
+                return 'World';
+            }
 
-/* ====== Helpers & State ====== */
-const num = v => (v==null||v==="") ? NaN : parseFloat(String(v).replace(',','.'));
-function continentByLatLon(lat, lon){
-  if (isNaN(lat)||isNaN(lon)) return 'World';
-  if (-60<=lat && lat<=12 && -82<=lon && lon<=-34) return 'South America';
-  if (  7<=lat && lat<=84 && -170<=lon && lon<=-50) return 'North America';
-  if (-35<=lat && lat<=37 && -20<=lon && lon<= 52) return 'Africa';
-  if ( 35<=lat && lat<=71 && -25<=lon && lon<= 45) return 'Europe';
-  if ( -5<=lat && lat<=80 &&  46<=lon && lon<=180) return 'Asia';
-  if (-50<=lat && lat<= 0 && 110<=lon && lon<=180) return 'Oceania';
-  return 'World';
-}
-function processRow(row){
-  const r = {
-    airline: row.airline || 'UNK',
-    src_iata: row.src_iata || '', dst_iata: row.dst_iata || '',
-    src_city: row.src_city || '', dst_city: row.dst_city || '',
-    src_country: row.src_country || '', dst_country: row.dst_country || '',
-    src_lat: num(row.src_latitude), src_lon: num(row.src_longitude),
-    dst_lat: num(row.dst_latitude), dst_lon: num(row.dst_longitude),
-    distance_km: num(row.distance_km),
-    route_key: row.route_key || ''
-  };
-  r.src_continent = continentByLatLon(r.src_lat, r.src_lon);
-  r.dst_continent = continentByLatLon(r.dst_lat, r.dst_lon);
-  return r;
-}
-const state = { routes:[], continent:'all', airline:'all' };
+            const FIELD = {
+                airline:       ['airline','carrier','airline_code'],
+                src_iata:      ['src_iata','source_iata','origin','from_iata','src_code'],
+                dst_iata:      ['dst_iata','destination_iata','to_iata','dst_code'],
+                src_latitude:  ['src_latitude','src_lat','source_latitude','from_lat'],
+                src_longitude: ['src_longitude','src_lon','source_longitude','from_lon'],
+                dst_latitude:  ['dst_latitude','dst_lat','destination_latitude','to_lat'],
+                dst_longitude: ['dst_longitude','dst_lon','destination_longitude','to_lon'],
+                src_city:      ['src_city','origin_city'],
+                dst_city:      ['dst_city','destination_city'],
+                src_country:   ['src_country','origin_country'],
+                dst_country:   ['dst_country','destination_country'],
+                distance_km:   ['distance_km','distance','km'],
+                route_key:     ['route_key','route','od','origin_dest']
+            };
+            const pick = (row, keys)=> keys.find(k => row[k]!=null && row[k]!=='' ) ? row[keys.find(k=>row[k]!=null && row[k]!=='' )] : null;
 
-/* ====== Charts ====== */
-const chart = {
-  map: echarts.init(document.getElementById('chart-map')),
-  analytics: echarts.init(document.getElementById('chart-analytics'))
-};
-window.addEventListener('resize', ()=> Object.values(chart).forEach(c=>c.resize()) );
+            function processData(rows){
+                return rows.map(row => {
+                const src_lat = num(pick(row, FIELD.src_latitude));
+                const src_lon = num(pick(row, FIELD.src_longitude));
+                const dst_lat = num(pick(row, FIELD.dst_latitude));
+                const dst_lon = num(pick(row, FIELD.dst_longitude));
+                const airline = pick(row, FIELD.airline) || 'UNK';
+                const src_iata = pick(row, FIELD.src_iata) || '';
+                const dst_iata = pick(row, FIELD.dst_iata) || '';
+                const rk = pick(row, FIELD.route_key) || `${src_iata} → ${dst_iata}`;
 
-/* ====== KPIs & Insights ====== */
-function fmtKm(v){ return Math.round(v).toLocaleString(LANG)+' km'; }
-function quantile(values, q){
-  const a = values.slice().sort((x,y)=>x-y); if(!a.length) return 0;
-  const pos = (a.length-1)*q, base = Math.floor(pos), rest = pos-base;
-  return a[base] + (a[base+1]-a[base]||0)*rest;
-}
-function updateKPIs(){
-  const r = filteredRoutes();
-  const airlines = new Set(r.map(d=>d.airline));
-  const countries = new Set(r.flatMap(d=>[d.src_country,d.dst_country]));
-  const dists = r.filter(d=>isFinite(d.distance_km)).map(d=>d.distance_km);
-  const avg = dists.length? dists.reduce((s,d)=>s+d,0)/dists.length : 0;
-  const med = dists.length? quantile(dists, .5) : 0;
-  const p90 = dists.length? quantile(dists, .9) : 0;
-  const longShare = r.length? Math.round(100*r.filter(d=>d.distance_km>3500).length/r.length) : 0;
+                return {
+                    airline,
+                    src_iata,
+                    dst_iata,
+                    src_city:    pick(row, FIELD.src_city)    || '',
+                    dst_city:    pick(row, FIELD.dst_city)    || '',
+                    src_country: pick(row, FIELD.src_country) || '',
+                    dst_country: pick(row, FIELD.dst_country) || '',
+                    src_lat, src_lon, dst_lat, dst_lon,
+                    src_continent: continentByLatLon(src_lat, src_lon),
+                    dst_continent: continentByLatLon(dst_lat, dst_lon),
+                    distance_km: num(pick(row, FIELD.distance_km)),
+                    route_key: rk
+                };
+                }).filter(r =>
+                !isNaN(r.src_lat) && !isNaN(r.src_lon) && !isNaN(r.dst_lat) && !isNaN(r.dst_lon)
+                );
+            }
 
-  document.getElementById('k_airlines').textContent = airlines.size;
-  document.getElementById('k_routes').textContent = r.length.toLocaleString(LANG);
-  document.getElementById('k_countries').textContent = countries.size;
-  document.getElementById('k_dist').textContent = avg? fmtKm(avg) : '–';
-  document.getElementById('k_long').textContent = longShare+'%';
+            function calculateKPIs(data){
+                const totalRoutes = data.length;
+                const activeAirlines = new Set(data.map(r=>r.airline)).size;
+                
+                const counts = data.reduce((acc, r) => {
+                    acc.airlines[r.airline] = (acc.airlines[r.airline] || 0) + 1;
+                    acc.routes[r.route_key] = (acc.routes[r.route_key] || 0) + 1;
+                    return acc;
+                }, { airlines: {}, routes: {} });
 
-  // Insights
-  const bySrc = {}; r.forEach(x=> bySrc[x.src_iata || x.src_city || 'UNK'] = (bySrc[x.src_iata || x.src_city || 'UNK']||0)+1 );
-  const topHub = Object.entries(bySrc).sort((a,b)=>b[1]-a[1])[0]?.[0] || '–';
-  const byCorr = {}; r.forEach(x=>{
-    const key = (x.src_continent||'World')+'→'+(x.dst_continent||'World');
-    byCorr[key]=(byCorr[key]||0)+1;
-  });
-  const topCorr = Object.entries(byCorr).sort((a,b)=>b[1]-a[1])[0]?.[0] || '–';
+                const topAirlineData = Object.entries(counts.airlines).sort((a,b) => b[1] - a[1])[0] || ['-', 0];
+                const busiestRoute = Object.keys(counts.routes).sort((a,b)=>counts.routes[b]-counts.routes[a])[0] || '-';
 
-  const wrap = document.getElementById('insights');
-  wrap.innerHTML = '';
-  const add = (icon, label, value) => {
-    const el = document.createElement('div'); el.className='tag';
-    el.innerHTML = `${icon} <b>${label}:</b>&nbsp;${value}`;
-    wrap.appendChild(el);
-  };
-  add('🛫', t('insights').topHub, topHub);
-  add('🌍', t('insights').corridor, topCorr);
-  add('📏', t('insights').median, fmtKm(med));
-  add('🎯', t('insights').p90, fmtKm(p90));
-  add('🚀', t('insights').longShare, longShare+'%');
-}
+                const longestRouteData = [...data].sort((a,b) => (b.distance_km || 0) - (a.distance_km || 0))[0];
 
-/* ====== Map ====== */
-function filteredRoutes(){
-  return state.routes.filter(r=>{
-    const a = state.airline==='all' || r.airline===state.airline;
-    const c = state.continent==='all' || r.src_continent===state.continent || r.dst_continent===state.continent;
-    return a && c;
-  });
-}
-function renderMap(){
-  const data = filteredRoutes().slice(0, 900);
-  const lines = data.map(r=>({
-    name: `${r.airline} | ${r.src_iata} → ${r.dst_iata}${isFinite(r.distance_km)?` • ${Math.round(r.distance_km)} km`:''}`,
-    coords: [[r.src_lon,r.src_lat],[r.dst_lon,r.dst_lat]]
-  }));
-  // unique dots
-  const dotKey = (lon,lat)=>lon.toFixed(2)+','+lat.toFixed(2);
-  const dotMap = new Map();
-  data.forEach(r=>{
-    const aK = dotKey(r.src_lon,r.src_lat), bK = dotKey(r.dst_lon,r.dst_lat);
-    if (!dotMap.has(aK)) dotMap.set(aK,{name:`${r.src_city||r.src_iata} (${r.src_country})`, value:[r.src_lon,r.src_lat]});
-    if (!dotMap.has(bK)) dotMap.set(bK,{name:`${r.dst_city||r.dst_iata} (${r.dst_country})`, value:[r.dst_lon,r.dst_lat]});
-  });
+                animateCounter(document.getElementById('total-routes'), 0, totalRoutes, 1200);
+                animateCounter(document.getElementById('active-airlines'), 0, activeAirlines, 1200);
 
-  chart.map.setOption({
-    backgroundColor:'transparent',
-    toolbox:{right:10, feature:{ saveAsImage:{}, dataView:{} }},
-    tooltip:{ trigger:'item' },
-    geo:{
-      map:'world', roam:true,
-      itemStyle:{ areaColor:'#0a1929', borderColor:'rgba(0,188,212,.25)' },
-      emphasis:{ itemStyle:{ areaColor:'#14324a' } }
-    },
-    series:[
-      { type:'lines', coordinateSystem:'geo', data:lines, zlevel:1,
-        effect:{ show:true, period:6, trailLength:0.1, symbol:'arrow', symbolSize:5 },
-        lineStyle:{ width:1, opacity:0.48, curveness:0.25,
-          color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,188,212,.7)'},{offset:1,color:'rgba(100,181,246,.7)'}]) } },
-      { type:'scatter', coordinateSystem:'geo', data:[...dotMap.values()], symbolSize:3, zlevel:2,
-        itemStyle:{ color:'rgba(0,188,212,.9)' } }
-    ]
-  });
-}
+                document.getElementById('top-airline').innerText = topAirlineData[0];
+                document.getElementById('top-airline-sub').innerText = `${topAirlineData[1].toLocaleString('fr-FR')} routes`;
 
-/* ====== Analytics (Timeline 3 vues) ====== */
-function buildAnalyticsOptions(){
-  const data = filteredRoutes();
+                document.getElementById('busiest-route').innerText = busiestRoute;
+                
+                if (longestRouteData) {
+                    document.getElementById('longest-route').innerText = `${Math.round(longestRouteData.distance_km).toLocaleString('fr-FR')} km`;
+                    document.getElementById('longest-route-sub').innerText = longestRouteData.route_key;
+                }
+            }
 
-  // 1) Top airlines
-  const topMap = {}; data.forEach(r=> topMap[r.airline]=(topMap[r.airline]||0)+1 );
-  const topArr = Object.entries(topMap).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const topOpt = {
-    title:{ text:'Top compagnies (par nombre de routes)' },
-    legend:{ show:true }, tooltip:{}, toolbox:{right:10, feature:{saveAsImage:{}, dataView:{}} },
-    grid:{left:60,right:20,top:40,bottom:50},
-    xAxis:{ type:'category', data: topArr.map(d=>d[0]), axisLabel:{ interval:0, rotate:30 }},
-    yAxis:{ type:'value', name:'Routes' },
-    series:[{ type:'bar', name:'Routes', data: topArr.map(d=>d[1]),
-      itemStyle:{ color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#00bcd4'},{offset:1,color:'#64b5f6'}]) }, barMaxWidth:28 }]
-  };
+            function populateFilters(data){
+                const airlines = [...new Set(data.map(r => r.airline))].sort();
+                airlineSelect.innerHTML = `<option value="all">${translations[currentLang].allAirlines}</option>`
+                + airlines.map(a=>`<option value="${a}">${a}</option>`).join('');
+                
+                const conts = [...new Set(data.flatMap(r => [r.src_continent, r.dst_continent]).filter(Boolean))].sort();
+                continentSelect.innerHTML = `<option value="all">${translations[currentLang].allContinents}</option>`
+                + conts.map(c=>`<option value="${c}">${c}</option>`).join('');
+            }
+            
+            function getFilteredData(){
+                const a = airlineSelect.value;
+                const c = continentSelect.value;
+                return allRoutesData.filter(r=>{
+                    const okA = (a==='all') || (r.airline===a);
+                    const okC = (c==='all') || r.src_continent===c || r.dst_continent===c;
+                    return okA && okC;
+                });
+            }
 
-  // 2) Distance distribution (bins)
-  const dists = data.filter(d=>isFinite(d.distance_km)).map(d=>d.distance_km);
-  const bins = [0,500,1000,1500,2000,3000,4000,6000,8000,10000,15000];
-  const labels = bins.slice(0,-1).map((b,i)=>`${b}-${bins[i+1]}`);
-  const counts = new Array(labels.length).fill(0);
-  dists.forEach(x=>{
-    for (let i=0;i<bins.length-1;i++){ if (x>=bins[i] && x<bins[i+1]) { counts[i]++; break; } }
-  });
-  const distOpt = {
-    title:{ text:'Distribution des distances (km)' },
-    legend:{ show:true }, tooltip:{ trigger:'axis' }, toolbox:{right:10, feature:{saveAsImage:{}, dataView:{}} },
-    grid:{left:60,right:20,top:40,bottom:50},
-    xAxis:{ type:'category', data: labels, axisLabel:{ rotate:30 }},
-    yAxis:{ type:'value', name:'Routes' },
-    series:[{ type:'bar', name:'Routes', data: counts,
-      itemStyle:{ color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#64b5f6'},{offset:1,color:'#00bcd4'}]) }, barMaxWidth:24 }]
-  };
+            // --- Charting ---
+            const initCharts = () => {
+                mapChart = echarts.init(mapChartEl);
+                topAirlinesChart = echarts.init(topAirlinesChartEl);
+                topAirportsChart = echarts.init(topAirportsChartEl);
+                continentPieChart = echarts.init(continentPieChartEl);
+            };
+            
+            function updateMapChart(data){
+                const routesToDisplay = godView ? data : data.slice(0, 600);
+                const lines = routesToDisplay.map(r=>({
+                name: `${r.airline} | ${r.src_iata} → ${r.dst_iata}${r.distance_km?` • ${Math.round(r.distance_km)} km`:''}`,
+                coords: [[r.src_lon, r.src_lat],[r.dst_lon, r.dst_lat]]
+                }));
+                const dots = [
+                ...routesToDisplay.map(r=>({name:`${r.src_city||r.src_iata} (${r.src_country})`, value:[r.src_lon,r.src_lat]})),
+                ...routesToDisplay.map(r=>({name:`${r.dst_city||r.dst_iata} (${r.dst_country})`, value:[r.dst_lon,r.dst_lat]})),
+                ];
 
-  // 3) Destination continents (donut)
-  const byCont = {}; data.forEach(r=> byCont[r.dst_continent]=(byCont[r.dst_continent]||0)+1 );
-  const contData = Object.entries(byCont).map(([name,value])=>({name,value})).sort((a,b)=>b.value-a.value);
-  const contOpt = {
-    title:{ text:'Répartition par continent (destination)' },
-    legend:{ bottom:0, textStyle:{ color:'#cfefff' } }, tooltip:{ trigger:'item', formatter:'{b}: {c} ({d}%)' },
-    toolbox:{right:10, feature:{saveAsImage:{}, dataView:{}} },
-    series:[{ type:'pie', radius:['42%','70%'], center:['50%','50%'], name:'Part',
-      label:{ color:'#e6f1ff' }, data: contData }]
-  };
+                mapChart.setOption({
+                    backgroundColor:'transparent',
+                    tooltip:{ trigger:'item' },
+                    geo:{
+                        map:'world', roam:true,
+                        itemStyle:{ areaColor:'rgba(10,25,41,1)', borderColor:'rgba(0,188,212,.25)'},
+                        emphasis:{ itemStyle:{ areaColor:'#14324a'} }
+                    },
+                    series:[
+                        { type:'lines', coordinateSystem:'geo', data:lines, zlevel:1,
+                        effect:{ show:true, period:6, trailLength:0.1, symbol:'arrow', symbolSize:5 },
+                        lineStyle:{ width:1, opacity:0.45, curveness:0.2,
+                            color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,188,212,.6)'},{offset:1,color:'rgba(100,181,246,.6)'}])
+                        }
+                        },
+                        { type:'scatter', coordinateSystem:'geo', data:dots, symbolSize:3,
+                        itemStyle:{ color:'rgba(0,188,212,.85)'}, zlevel:2 }
+                    ]
+                }, { notMerge: true });
+            }
+            
+            function updateAnalyticsCharts(data) {
+                // Top Airlines
+                const airlineCounts = data.reduce((acc, r) => {
+                    acc[r.airline] = (acc[r.airline] || 0) + 1;
+                    return acc;
+                }, {});
+                const topAirlines = Object.entries(airlineCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).reverse();
 
-  // Timeline with 3 options
-  return {
-    baseOption:{
-      timeline:{
-        axisType:'category',
-        data:['Top Airlines','Distances','Continents'],
-        autoPlay:true, playInterval:4000, bottom:0, label:{ color:'#cfefff' }
-      },
-      series:[{},{},{}]
-    },
-    options:[ topOpt, distOpt, contOpt ]
-  };
-}
-function renderAnalytics(){
-  const opt = buildAnalyticsOptions();
-  chart.analytics.setOption(opt, true);
-}
+                topAirlinesChart.setOption({
+                    title: { text: translations[currentLang].top10Airlines, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'value', axisLine: { lineStyle: { color: '#8892b0' } }, splitLine: { lineStyle: { color: 'rgba(136, 146, 176, 0.1)' } } },
+                    yAxis: { type: 'category', data: topAirlines.map(a => a[0]), axisLine: { show: true, lineStyle: { color: '#8892b0' } } },
+                    series: [{ data: topAirlines.map(a => a[1]), type: 'bar', itemStyle: { color: 'var(--accent-cyan)' } }]
+                });
 
-/* ====== Export PDF ====== */
-function exportPDF(){
-  const opt = { filename:'airflow-dashboard.pdf', image:{type:'jpeg',quality:0.96}, html2canvas:{scale:1.2},
-                jsPDF:{unit:'px',format:'a4',orientation:'landscape'} };
-  html2pdf().set(opt).from(document.querySelector('.container')).save();
-}
+                // Top Airports
+                const airportCounts = data.reduce((acc, r) => {
+                    acc[r.src_iata] = (acc[r.src_iata] || 0) + 1;
+                    acc[r.dst_iata] = (acc[r.dst_iata] || 0) + 1;
+                    return acc;
+                }, {});
+                const topAirports = Object.entries(airportCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).reverse();
 
-/* ====== Boot ====== */
-async function boot(){
-  applyI18n();
-  document.getElementById('btn-fr').onclick=()=>{LANG='fr';localStorage.setItem('lang','fr');applyI18n();renderAnalytics();}
-  document.getElementById('btn-en').onclick=()=>{LANG='en';localStorage.setItem('lang','en');applyI18n();renderAnalytics();}
-  document.getElementById('btn-pdf').onclick=exportPDF;
+                topAirportsChart.setOption({
+                    title: { text: translations[currentLang].top10Airports, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'value', axisLine: { lineStyle: { color: '#8892b0' } }, splitLine: { lineStyle: { color: 'rgba(136, 146, 176, 0.1)' } } },
+                    yAxis: { type: 'category', data: topAirports.map(a => a[0]), axisLine: { show: true, lineStyle: { color: '#8892b0' } } },
+                    series: [{ data: topAirports.map(a => a[1]), type: 'bar', itemStyle: { color: 'var(--accent-blue)' } }]
+                });
 
-  // Tabs switching
-  document.querySelectorAll('.tab').forEach(tab=>{
-    tab.onclick=()=>{
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      const v = tab.dataset.tab;
-      document.getElementById('view-visual').style.display = v==='visual'?'grid':'none';
-      document.getElementById('view-analytics').style.display = v==='analytics'?'block':'none';
-      chart.map.resize(); chart.analytics.resize();
-    };
-  });
+                // Continent Pie
+                const continentCounts = data.reduce((acc, r) => {
+                    if (r.src_continent !== 'World') acc[r.src_continent] = (acc[r.src_continent] || 0) + 1;
+                    return acc;
+                }, {});
+                const pieData = Object.entries(continentCounts).map(([name, value]) => ({name, value}));
 
-  // Filters
-  const selCont = document.getElementById('continent');
-  const selAir  = document.getElementById('airline');
-  document.getElementById('btn-reset').onclick=()=>{ selCont.value='all'; selAir.value='all'; state.continent='all'; state.airline='all'; refresh(); };
+                continentPieChart.setOption({
+                    title: { text: translations[currentLang].routesByContinent, left: 'center', textStyle: { color: 'var(--text-white)' } },
+                    tooltip: { trigger: 'item' },
+                    legend: { orient: 'vertical', left: 'left', textStyle: { color: 'var(--text-white)' } },
+                    series: [{
+                        type: 'pie',
+                        radius: '50%',
+                        data: pieData,
+                        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+                    }]
+                });
+            }
 
-  selCont.onchange=e=>{state.continent=e.target.value; refresh();}
-  selAir.onchange =e=>{state.airline  =e.target.value; refresh();}
+            function updateAnalyticsChartsTitles() {
+                if(topAirlinesChart) topAirlinesChart.setOption({ title: { text: translations[currentLang].top10Airlines } });
+                if(topAirportsChart) topAirportsChart.setOption({ title: { text: translations[currentLang].top10Airports } });
+                if(continentPieChart) continentPieChart.setOption({ title: { text: translations[currentLang].routesByContinent } });
+            }
 
-  // Load CSV
-  const resp = await fetch('./routes_front_plus.csv');
-  const txt  = await resp.text();
-  const parsed = Papa.parse(txt, { header:true, skipEmptyLines:true }); // auto delimiter
-  state.routes = parsed.data.map(processRow).filter(r=>!isNaN(r.src_lat)&&!isNaN(r.src_lon)&&!isNaN(r.dst_lat)&&!isNaN(r.dst_lon));
 
-  // Populate filters
-  const uniqA = [...new Set(state.routes.map(r=>r.airline))].sort();
-  selAir.innerHTML = `<option value="all">${t('allAirlines')}</option>` + uniqA.map(a=>`<option>${a}</option>`).join('');
-  const uniqC = [...new Set(state.routes.flatMap(r=>[r.src_continent,r.dst_continent]))].filter(Boolean).sort();
-  selCont.innerHTML = `<option value="all">${t('allContinents')}</option>` + uniqC.map(c=>`<option>${c}</option>`).join('');
+            // --- Event Handlers ---
+            const handleFilterChange = () => {
+                const filteredData = getFilteredData();
+                updateMapChart(filteredData);
+                calculateKPIs(filteredData);
+                updateAnalyticsCharts(filteredData);
+            };
 
-  refresh();
-  document.getElementById('loading').style.display='none';
-}
-function refresh(){ updateKPIs(); renderMap(); renderAnalytics(); }
+            const handleTabClick = (isMap) => {
+                tabMap.classList.toggle('active', isMap);
+                tabAnalytics.classList.toggle('active', !isMap);
+                mapChartEl.classList.toggle('hidden', !isMap);
+                analyticsChartEl.classList.toggle('hidden', isMap);
+                if(!isMap) {
+                    topAirlinesChart.resize();
+                    topAirportsChart.resize();
+                    continentPieChart.resize();
+                }
+            };
 
-boot();
-</script>
+            const handleKonamiCode = (e) => {
+                if (e.key === konamiCode[konamiIndex]) {
+                    konamiIndex++;
+                    if (konamiIndex === konamiCode.length) {
+                        konamiIndex = 0;
+                        godView = !godView;
+                        const banner = document.createElement('div');
+                        banner.className = 'god-view-banner';
+                        banner.textContent = `God View ${godView ? 'Activated' : 'Deactivated'}`;
+                        document.body.appendChild(banner);
+                        setTimeout(() => banner.remove(), 3000);
+                        handleFilterChange();
+                    }
+                } else {
+                    konamiIndex = 0;
+                }
+            };
+
+            const createDemoSequence = () => {
+                resetFiltersBtn.click();
+                mapChart.dispatchAction({ type: 'restore' });
+
+                setTimeout(() => {
+                    mapChart.dispatchAction({
+                        type: 'geoRoam',
+                        dx: -200,
+                        dy: 100,
+                        zoom: 1.5
+                    });
+                }, 1000);
+                
+                setTimeout(() => tabAnalytics.click(), 3000);
+                setTimeout(() => tabMap.click(), 5000);
+                setTimeout(() => {
+                    mapChart.dispatchAction({ type: 'restore' });
+                }, 7000);
+            };
+
+            const main = async () => {
+                initCharts();
+                translatePage();
+
+                tabMap.addEventListener('click', () => handleTabClick(true));
+                tabAnalytics.addEventListener('click', () => handleTabClick(false));
+                airlineSelect.addEventListener('change', handleFilterChange);
+                continentSelect.addEventListener('change', handleFilterChange);
+                resetFiltersBtn.addEventListener('click', () => {
+                    airlineSelect.value = 'all';
+                    continentSelect.value = 'all';
+                    handleFilterChange();
+                    mapChart.dispatchAction({ type: 'restore' });
+                });
+                langToggle.addEventListener('click', () => {
+                    currentLang = currentLang === 'fr' ? 'en' : 'fr';
+                    document.getElementById('lang-fr').style.opacity = currentLang === 'fr' ? '1' : '0.5';
+                    document.getElementById('lang-en').style.opacity = currentLang === 'en' ? '1' : '0.5';
+                    translatePage();
+                });
+                exportPdfBtn.addEventListener('click', () => {
+                    const dashboard = document.getElementById('main-dashboard');
+                    html2canvas(dashboard, { backgroundColor: '#0a1929' }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('l', 'px', [canvas.width, canvas.height]);
+                        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                        pdf.save("airflow-dashboard.pdf");
+                    });
+                });
+                demoBtn.addEventListener('click', createDemoSequence);
+                window.addEventListener('keydown', handleKonamiCode);
+                window.addEventListener('resize', () => {
+                    mapChart.resize();
+                    topAirlinesChart.resize();
+                    topAirportsChart.resize();
+                    continentPieChart.resize();
+                });
+
+                try {
+                    const response = await fetch('./routes_front_plus.csv');
+                    const csvText  = await response.text();
+                    const parsed   = Papa.parse(csvText, { skipEmptyLines:true, header:true, delimiter:"," });
+                    allRoutesData  = processData(parsed.data);
+
+                    populateFilters(allRoutesData);
+                    calculateKPIs(allRoutesData);
+                    updateMapChart(allRoutesData);
+                    updateAnalyticsCharts(allRoutesData);
+                } catch(e){
+                    console.error(e);
+                    alert("Impossible de charger les données de vol.");
+                } finally {
+                    loadingOverlay.classList.add('hidden');
+                }
+            };
+
+            main();
+        });
+    </script>
 </body>
 </html>
+
